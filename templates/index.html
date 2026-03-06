@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中文文本纠错系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>中文文本纠错系统</h1>
+            <p>上传 Word 或文本文件，自动检测并纠正中文文本错误</p>
+        </header>
+
+        <div class="content-wrapper">
+            <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" accept=".doc,.docx,.txt" hidden>
+                <div class="upload-content">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p>点击或拖拽文件到此处</p>
+                    <p class="file-types">支持 .doc、.docx 和 .txt 格式</p>
+                </div>
+            </div>
+            <div class="file-info" id="fileInfo" style="display: none;">
+                <div class="file-info-content">
+                    <span id="fileName"></span>
+                    <span class="success-badge">上传成功</span>
+                </div>
+                <button class="btn-clear" id="clearFile">更换文件</button>
+            </div>
+        </div>
+
+        <div class="action-section" id="actionSection" style="display: none;">
+            <button class="btn-primary btn-large" id="correctBtn">开始纠错</button>
+        </div>
+
+        <div class="text-input-section">
+            <div class="section-header">
+                <h3>或直接输入文本</h3>
+            </div>
+            <textarea id="textInput" placeholder="在此输入需要纠错的文本..."></textarea>
+            <button class="btn-primary" id="correctTextBtn">纠错文本</button>
+        </div>
+
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-header">
+                <h2>纠错结果</h2>
+                <div class="header-actions" id="errorStats">
+                    <span class="stat-item">发现错误: <strong id="errorCount">0</strong> 处</span>
+                </div>
+            </div>
+
+            <div class="errors-list" id="errorsListContainer">
+                <h3>错误详情</h3>
+                <div id="errorsList"></div>
+            </div>
+
+            <div id="noErrorsMessage" style="display: none;">
+                <p class="no-errors">没有发现错误</p>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="loading" id="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p id="loadingText">处理中...</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# 中文文本纠错系统依赖
+# 安装命令: pip install -r requirements.txt
+
+Flask>=3.0.0
+Werkzeug>=3.0.0
+pycorrector>=1.1.0
+python-docx>=1.1.0
+docx2txt>=0.8
+
+# pycorrector 依赖（确保版本兼容）
+jieba>=0.42.1
+numpy>=1.24.0
+pandas>=2.0.0
+transformers>=4.30.0
+torch>=2.0.0
