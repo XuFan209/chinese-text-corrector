@@ -63,11 +63,14 @@ def check_model():
     print("\n检查模型...")
     
     import os
-    model_path = os.path.join(os.path.dirname(__file__), 'models', 'macbert4csc-base-chinese')
+    import pycorrector
+    
+    site_packages = os.path.dirname(os.path.dirname(pycorrector.__file__))
+    model_path = os.path.join(site_packages, 'macbert4csc-base-chinese')
     
     if not os.path.exists(model_path):
         print(f"✗ 模型未找到: {model_path}")
-        print("请确保模型文件已下载到 models/macbert4csc-base-chinese/ 目录")
+        print("请确保模型文件已下载到 site-packages 目录")
         input("按回车键退出...")
         sys.exit(1)
     
