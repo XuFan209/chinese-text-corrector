@@ -198,23 +198,19 @@ def correct_punctuation(text):
     corrections = []
     corrected = text
     
-    # 连续相同标点的正则模式
-    # 匹配连续两个或更多相同的中文标点
-    repeated_chinese_punct = re.compile(r'([，。！？；：""''（）【】《》、,!?;:])(\1+)')
+    # 简单方式：直接查找连续两个相同的中文标点
+    # 中文标点列表
+    chinese_puncts = ['，', '。', '、', '；', '：', '！', '？', '"', '"', ''', ''', '（', '）', '【', '】', '《', '》']
     
-    # 处理连续标点
-    for match in repeated_chinese_punct.finditer(corrected):
-        wrong = match.group()
-        punct = match.group(1)
-        count = len(match.group(2))
-        
-        # 只保留一个标点
-        if count > 1:
-            corrected = corrected.replace(wrong, punct, 1)
+    for punct in chinese_puncts:
+        double_punct = punct + punct
+        while double_punct in corrected:
+            pos = corrected.find(double_punct)
+            corrected = corrected.replace(double_punct, punct, 1)
             corrections.append({
-                'wrong': wrong,
+                'wrong': double_punct,
                 'correct': punct,
-                'position': match.start(),
+                'position': pos,
                 'type': 'punctuation'
             })
     
