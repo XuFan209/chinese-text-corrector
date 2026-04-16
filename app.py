@@ -284,8 +284,15 @@ def correct_text():
         if patterns:
             log(f"Protected {len(patterns)} datetime patterns")
 
-        # 使用MacBERT进行纠错
+        # 标点符号纠错（在MacBERT之前，这样不会被其他处理干扰）
         all_errors = []
+        try:
+            protected_text, punct_errors = correct_punctuation(protected_text)
+            all_errors.extend(punct_errors)
+            log(f"Punctuation correction found {len(punct_errors)} errors")
+        except Exception as e:
+            log(f"Punctuation correction failed: {e}")
+
         corrected_text = protected_text
 
         try:
@@ -314,14 +321,6 @@ def correct_text():
         if patterns:
             corrected_text = restore_patterns(corrected_text, patterns)
             log(f"Restored {len(patterns)} datetime patterns")
-
-        # 标点符号纠错
-        try:
-            corrected_text, punct_errors = correct_punctuation(corrected_text)
-            all_errors.extend(punct_errors)
-            log(f"Punctuation correction found {len(punct_errors)} errors")
-        except Exception as e:
-            log(f"Punctuation correction failed: {e}")
 
         # 按位置排序错误
         all_errors.sort(key=lambda x: x['position'])
