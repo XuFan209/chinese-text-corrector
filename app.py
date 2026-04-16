@@ -185,6 +185,85 @@ def restore_patterns(text, patterns):
     return text
 
 
+def correct_punctuation(text):
+    """
+    标点符号纠错
+    处理常见的标点符号错误：
+    1. 连续两个相同标点（如 ,, 。。、，）
+    2. 中英文标点混用
+    3. 全角半角混用
+    """
+    import re
+    
+    corrections = []
+    corrected = text
+    
+    # 连续相同标点的正则模式
+    # 匹配连续两个或更多相同的中文标点
+    repeated_chinese_punct = re.compile(r'([，。！？；：""''（）【】《》、,!?;:])(\1+)')
+    
+    # 处理连续标点
+    for match in repeated_chinese_punct.finditer(corrected):
+        wrong = match.group()
+        punct = match.group(1)
+        count = len(match.group(2))
+        
+        # 只保留一个标点
+        if count > 1:
+            corrected = corrected.replace(wrong, punct, 1)
+            corrections.append({
+                'wrong': wrong,
+                'correct': punct,
+                'position': match.start(),
+                'type': 'punctuation'
+            })
+    
+    # 中文标点映射（全角 -> 半角对应）
+    # 这里我们只处理明显错误的情况
+    
+    # 处理 "。" 后面直接跟 "。" 的情况
+    repeated_dot = re.compile(r'(\。)(\.)|(\.)(\。)')
+    for match in repeated_dot.finditer(corrected):
+        wrong = match.group()
+        corrected = corrected.replace(wrong, '。', 1)
+        corrections.append({
+            'wrong': wrong,
+            'correct': '。',
+            'position': match.start(),
+            'type': 'punctuation'
+        })
+    
+    # 处理 "，" 后面直接跟 "," 的情况
+    repeated_comma = re.compile(r'(，)(,)|(,)(，)')
+    for match in repeated_comma.finditer(corrected):
+        wrong = match.group()
+        corrected = corrected.replace(wrong, '，', 1)
+        corrections.append({
+            'wrong': wrong,
+            'correct': '，',
+            'position': match.start(),
+            'type': 'punctuation'
+        })
+    
+    # 处理句末连续两个标点
+    end_punct = re.compile(r'([。！？])([，。！？])')
+    for match in end_punct.finditer(corrected):
+        wrong = match.group()
+        # 保留第一个，删除第二个
+        corrected = corrected.replace(wrong, match.group(1), 1)
+        corrections.append({
+            'wrong': wrong,
+            'correct': match.group(1),
+            'position': match.start(),
+            'type': 'punctuation'
+        })
+    
+    # 按位置排序
+    corrections.sort(key=lambda x: x['position'])
+    
+    return corrected, corrections
+
+
 @app.route('/correct', methods=['POST'])
 def correct_text():
     """
@@ -239,6 +318,14 @@ def correct_text():
         if patterns:
             corrected_text = restore_patterns(corrected_text, patterns)
             log(f"Restored {len(patterns)} datetime patterns")
+
+        # 标点符号纠错
+        try:
+            corrected_text, punct_errors = correct_punctuation(corrected_text)
+            all_errors.extend(punct_errors)
+            log(f"Punctuation correction found {len(punct_errors)} errors")
+        except Exception as e:
+            log(f"Punctuation correction failed: {e}")
 
         # 按位置排序错误
         all_errors.sort(key=lambda x: x['position'])
